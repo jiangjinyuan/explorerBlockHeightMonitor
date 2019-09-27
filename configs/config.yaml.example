@@ -1,0 +1,80 @@
+BtcApi:
+  BlockChain: "https://blockchain.info/latestblock"
+  BlockChair: "https://api.blockchair.com/bitcoin/blocks?limit=1"
+  ViaBtc: "https://explorer.viabtc.com/res/btc/blocks?limit=1"
+  BTCcom: ""
+
+BchApi:
+  BlockChair: "https://api.blockchair.com/bitcoin-cash/blocks?limit=1"
+  Bitcoin: "https://rest.bitcoin.com/v2/blockchain/getBlockchaininfo"
+  ViaBtc: "https://explorer.viabtc.com/res/bch/blocks?limit=1"
+  BTCcom: ""
+
+LtcApi:
+  BlockChair: "https://api.blockchair.com/litecoin/blocks?limit=1"
+  ViaBtc: "https://explorer.viabtc.com/res/ltc/blocks?limit=1"
+  BlockCypher: "https://api.blockcypher.com/v1/ltc/main"
+  BTCcom: ""
+
+EthApi:
+  Etherscan: "https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=latest&boolean=true&apikey=YourApiKeyToken"
+  BlockChain: "https://api.blockchain.info/v2/eth/data/blocks?size=1"
+  BlockChair: "https://api.blockchair.com/ethereum/mempool/blocks?limit=1"
+  BTCcom: ""
+
+EtcApi:
+  Gastracker: "https://api.gastracker.io/v1/blocks/latest"
+  BlockScout: "https://blockscout.com/etc/mainnet/api?module=block&action=eth_block_number"
+  EtcBlockExplorer: "https://etcblockexplorer.com/data"
+  BTCcom: ""
+
+BtcNode:
+  ServerEndPoint: "http://127.0.0.1:8332/"
+  UserName: ""
+  Password: ""
+
+BchNode:
+  ServerEndPoint: "http://127.0.0.1:8332/"
+  UserName: ""
+  Password: ""
+
+LtcNode:
+  ServerEndPoint: "http://127.0.0.1:9334/"
+  UserName: ""
+  Password: ""
+
+EthNode:
+  ServerEndPoint: "http://127.0.0.1:8545/"
+  UserName: ""
+  Password: ""
+
+EtcNode:
+  ServerEndPoint: "http://127.0.0.1:8545/"
+  UserName: ""
+  Password: ""
+
+Slack:
+  WebHookURL: "https://hooks.slack.com/services/"
+  IsEnable: false
+
+Email:
+  SenderName: "***@gamil.com"
+  SenderPassword: "*********"
+  Host: "smtp.gmail.com"
+  Port: 587
+  IsEnable: false
+
+DB:
+  Driver: mysql
+  UserName: root
+  Password: 123456
+  Host: 127.0.0.1
+  Port: 3307
+  Schema: latest_block_height
+
+AlarmThreshold:
+  Btc: 2
+  Bch: 2
+  Ltc: 2
+  Eth: 3
+  Etc: 3
