@@ -32,7 +32,7 @@ func(e *EmailSender)SendText(text map[string]string){
 	m.SetHeader("Subject", "Attention from blockHeightMonitor!")
 	m.SetBody("text/html", textBody)
 
-	d := gomail.NewPlainDialer(configs.Config.Email.Host, configs.Config.Email.Port, configs.Config.Email.SenderName, configs.Config.Email.SenderPassword)
+	d := gomail.NewDialer(configs.Config.Email.Host, configs.Config.Email.Port, configs.Config.Email.SenderName, configs.Config.Email.SenderPassword)
 	if err := d.DialAndSend(m); err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func(e *EmailSender)Send(mess string){
 	m.SetHeader("Subject", "Attention from blockHeightMonitor!")
 	m.SetBody("text/html", mess)
 
-	d := gomail.NewPlainDialer(configs.Config.Email.Host, configs.Config.Email.Port, configs.Config.Email.SenderName, configs.Config.Email.SenderPassword)
+	d := gomail.NewDialer(configs.Config.Email.Host, configs.Config.Email.Port, configs.Config.Email.SenderName, configs.Config.Email.SenderPassword)
 	if err := d.DialAndSend(m); err != nil {
 		panic(err)
 	}
