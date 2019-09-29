@@ -1,9 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/util"
-	"encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,13 +16,13 @@ func (b *BlockChair) GetBlockInfo(coin string) {
 	var body []byte
 	switch coin {
 	case "btc":
-		body = util.GetHttpResponse("GET",configs.Config.BtcApi.BlockChair)
+		body = util.GetHttpResponse("GET", configs.Config.BtcApi.BlockChair)
 	case "bch":
-		body = util.GetHttpResponse("GET",configs.Config.BchApi.BlockChair)
+		body = util.GetHttpResponse("GET", configs.Config.BchApi.BlockChair)
 	case "ltc":
-		body = util.GetHttpResponse("GET",configs.Config.LtcApi.BlockChair)
+		body = util.GetHttpResponse("GET", configs.Config.LtcApi.BlockChair)
 	case "eth":
-		body = util.GetHttpResponse("GET",configs.Config.EthApi.BlockChair)
+		body = util.GetHttpResponse("GET", configs.Config.EthApi.BlockChair)
 		//body=util.HttpHandle("GET",configs.Config.EthApi.BlockChair)
 	}
 	b.Unmarshal(body)

@@ -1,30 +1,30 @@
 package models
 
 import (
+	"encoding/json"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/util"
-	"encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
 type BTCcom struct {
-	Height int64 `json:"height"`
-	Hash string `json:"hash"`
+	Height int64  `json:"height"`
+	Hash   string `json:"hash"`
 }
 
-func(b *BTCcom) GetBlockInfo(coin string){
+func (b *BTCcom) GetBlockInfo(coin string) {
 	var body []byte
 	switch coin {
 	case "btc":
-		body = util.GetHttpResponse("GET",configs.Config.BtcApi.BTCcom)
+		body = util.GetHttpResponse("GET", configs.Config.BtcApi.BTCcom)
 	case "bch":
-		body = util.GetHttpResponse("GET",configs.Config.BchApi.BTCcom)
+		body = util.GetHttpResponse("GET", configs.Config.BchApi.BTCcom)
 	case "ltc":
-		body = util.GetHttpResponse("GET",configs.Config.LtcApi.BTCcom)
+		body = util.GetHttpResponse("GET", configs.Config.LtcApi.BTCcom)
 	case "eth":
-		body = util.GetHttpResponse("GET",configs.Config.EthApi.BTCcom)
+		body = util.GetHttpResponse("GET", configs.Config.EthApi.BTCcom)
 	case "etc":
-		body = util.GetHttpResponse("GET",configs.Config.EtcApi.BTCcom)
+		body = util.GetHttpResponse("GET", configs.Config.EtcApi.BTCcom)
 	}
 	b.Unmarshal(body)
 

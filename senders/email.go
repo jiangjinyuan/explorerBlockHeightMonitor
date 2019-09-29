@@ -6,27 +6,28 @@ import (
 )
 
 type EmailSender struct {
-
 }
+
 var EmailPublisher EmailSender
-func(e *EmailSender)SendText(text map[string]string){
-	if !configs.Config.Email.IsEnable{
+
+func (e *EmailSender) SendText(text map[string]string) {
+	if !configs.Config.Email.IsEnable {
 		return
 	}
-	textBody:=""
-	temp:=""
-	for key,result:=range text{
-		if key =="0"{
-			temp="<p>"+result+"<p>"
-		}else{
-			result="<p>"+result+"<p>"
-			textBody+=result
+	textBody := ""
+	temp := ""
+	for key, result := range text {
+		if key == "0" {
+			temp = "<p>" + result + "<p>"
+		} else {
+			result = "<p>" + result + "<p>"
+			textBody += result
 		}
 	}
-	textBody=temp+textBody
+	textBody = temp + textBody
 	m := gomail.NewMessage()
 	//sender
-	m.SetAddressHeader("From", configs.Config.Email.SenderName,"sender")
+	m.SetAddressHeader("From", configs.Config.Email.SenderName, "sender")
 	//receiver
 	m.SetHeader("To", m.FormatAddress(configs.Config.Email.SenderName, "receiver"))
 	m.SetHeader("Subject", "Attention from blockHeightMonitor!")
@@ -38,13 +39,13 @@ func(e *EmailSender)SendText(text map[string]string){
 	}
 }
 
-func(e *EmailSender)Send(mess string){
-	if !configs.Config.Email.IsEnable{
+func (e *EmailSender) Send(mess string) {
+	if !configs.Config.Email.IsEnable {
 		return
 	}
 	m := gomail.NewMessage()
 	//sender
-	m.SetAddressHeader("From", configs.Config.Email.SenderName,"sender")
+	m.SetAddressHeader("From", configs.Config.Email.SenderName, "sender")
 	//receiver
 	m.SetHeader("To", m.FormatAddress(configs.Config.Email.SenderName, "receiver"))
 	m.SetHeader("Subject", "Attention from blockHeightMonitor!")

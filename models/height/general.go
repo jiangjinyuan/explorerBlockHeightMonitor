@@ -1,12 +1,12 @@
 package height
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/models"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/senders"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/util"
-	"database/sql"
-	"fmt"
 	"strconv"
 	"sync"
 )
@@ -17,7 +17,7 @@ type BlockHeightMonitor struct {
 	Hash   map[string]string
 }
 
-func (b *BlockHeightMonitor) Run(coin string,db *sql.DB) {
+func (b *BlockHeightMonitor) Run(coin string, db *sql.DB) {
 	b.Height = make(map[string]int64)
 	b.Hash = make(map[string]string)
 	switch coin {
@@ -115,7 +115,7 @@ func (b *BlockHeightMonitor) Run(coin string,db *sql.DB) {
 			var temp2 models.BlockChainEth
 			temp2.GetBlockInfo()
 			b.Height["BlockChain"], _ = strconv.ParseInt(temp2.Height, 0, 64)
-			b.Hash["BlockChain"]=temp2.Hash
+			b.Hash["BlockChain"] = temp2.Hash
 			b.wg.Done()
 		}()
 		b.wg.Add(1)
@@ -156,7 +156,7 @@ func (b *BlockHeightMonitor) Run(coin string,db *sql.DB) {
 		var temp5 models.Node
 		temp5.GetBlockInfo(coin)
 		b.Height["Node"] = temp5.Height
-		b.Hash["Node"]=temp5.Hash
+		b.Hash["Node"] = temp5.Hash
 		b.wg.Done()
 	}()
 	b.wg.Wait()
@@ -201,7 +201,7 @@ func (b BlockHeightMonitor) Compare(coin string) {
 		N = configs.Config.AlarmThreshold.Etc
 		text["0"] = fmt.Sprintf("Our ETC node's blockHeight:")
 		count["Gastracker"] = b.Height["Gastracker"] - b.Height["BTCcom"]
-		count["EtcBlockExplorer"]=b.Height["EtcBlockExplorer"]-b.Height["BTCcom"]
+		count["EtcBlockExplorer"] = b.Height["EtcBlockExplorer"] - b.Height["BTCcom"]
 	}
 
 	count["Node"] = b.Height["Node"] - b.Height["BTCcom"]

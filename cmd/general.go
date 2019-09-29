@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-
 func init(){
 	rootCmd.AddCommand(generalCoinCmd)
 }

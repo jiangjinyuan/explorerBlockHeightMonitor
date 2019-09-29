@@ -1,10 +1,10 @@
 package util
 
 import (
-	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -27,33 +27,33 @@ func InitDB() (db *sql.DB) {
 func Insert(db *sql.DB, coin string, Height map[string]int64, Hash map[string]string) {
 	switch coin {
 	case "btc":
-		s:=fmt.Sprintf("insert into %s.%s(BlockChain_height,BlockChair_height,ViaBtc_height,BTCcom_height,Node_height,BlockChain_hash,BlockChair_hash,ViaBtc_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)",configs.Config.DB.Schema,coin)
-		_, err := db.Exec(s, Height["BlockChain"], Height["BlockChair"], Height["ViaBtc"], Height["BTC.com"],Height["Node"], Hash["BlockChain"], Hash["BlockChair"], Hash["ViaBtc"], Hash["BTC.com"],Hash["Node"])
+		s := fmt.Sprintf("insert into %s.%s(BlockChain_height,BlockChair_height,ViaBtc_height,BTCcom_height,Node_height,BlockChain_hash,BlockChair_hash,ViaBtc_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)", configs.Config.DB.Schema, coin)
+		_, err := db.Exec(s, Height["BlockChain"], Height["BlockChair"], Height["ViaBtc"], Height["BTC.com"], Height["Node"], Hash["BlockChain"], Hash["BlockChair"], Hash["ViaBtc"], Hash["BTC.com"], Hash["Node"])
 		if err != nil {
 			log.Error(err)
 			panic(err)
 		}
 
 	case "bch":
-		s:=fmt.Sprintf("insert into %s.%s(BlockChair_height,Bitcoin_height,ViaBtc_height,BTCcom_height,Node_height,BlockChair_hash,Bitcoin_hash,ViaBtc_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)",configs.Config.DB.Schema,coin)
-		_, err := db.Exec(s,Height["BlockChair"], Height["Bitcoin"], Height["ViaBtc"], Height["BTC.com"],Height["Node"], Hash["BlockChair"], Hash["Bitcoin"], Hash["ViaBtc"], Hash["BTC.com"],Hash["Node"])
+		s := fmt.Sprintf("insert into %s.%s(BlockChair_height,Bitcoin_height,ViaBtc_height,BTCcom_height,Node_height,BlockChair_hash,Bitcoin_hash,ViaBtc_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)", configs.Config.DB.Schema, coin)
+		_, err := db.Exec(s, Height["BlockChair"], Height["Bitcoin"], Height["ViaBtc"], Height["BTC.com"], Height["Node"], Hash["BlockChair"], Hash["Bitcoin"], Hash["ViaBtc"], Hash["BTC.com"], Hash["Node"])
 		if err != nil {
 			log.Error(err)
 			panic(err)
 		}
 
 	case "ltc":
-		s:=fmt.Sprintf("insert into %s.%s(BlockChair_height,ViaBtc_height,BlockCypher_height,BTCcom_height,Node_height,BlockChair_hash,ViaBtc_hash,BlockCypher_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)",configs.Config.DB.Schema,coin)
-		_, err := db.Exec(s,Height["BlockChair"], Height["ViaBtc"], Height["BlockCypher"], Height["BTC.com"],Height["Node"], Hash["BlockChair"], Hash["ViaBtc"], Hash["BlockCypher"], Hash["BTC.com"],Hash["Node"])
-		if err!=nil{
+		s := fmt.Sprintf("insert into %s.%s(BlockChair_height,ViaBtc_height,BlockCypher_height,BTCcom_height,Node_height,BlockChair_hash,ViaBtc_hash,BlockCypher_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)", configs.Config.DB.Schema, coin)
+		_, err := db.Exec(s, Height["BlockChair"], Height["ViaBtc"], Height["BlockCypher"], Height["BTC.com"], Height["Node"], Hash["BlockChair"], Hash["ViaBtc"], Hash["BlockCypher"], Hash["BTC.com"], Hash["Node"])
+		if err != nil {
 			log.Error(err)
 			panic(err)
 		}
 
 	case "eth":
-		s:=fmt.Sprintf("insert into %s.%s(Etherscan_height,BlockChain_height,BlockChair_height,BTCcom_height,Node_height,Etherscan_hash,BlockChain_hash,BlockChair_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)",configs.Config.DB.Schema,coin)
-		_, err := db.Exec(s,Height["Etherscan"], Height["BlockChain"], Height["BlockChair"], Height["BTC.com"],Height["Node"],Hash["Etherscan"], Hash["BlockChain"], Hash["BlockChair"], Hash["BTC.com"],Hash["Node"])
-		if err!=nil{
+		s := fmt.Sprintf("insert into %s.%s(Etherscan_height,BlockChain_height,BlockChair_height,BTCcom_height,Node_height,Etherscan_hash,BlockChain_hash,BlockChair_hash,BTCcom_hash,Node_hash) values(?,?,?,?,?,?,?,?,?,?)", configs.Config.DB.Schema, coin)
+		_, err := db.Exec(s, Height["Etherscan"], Height["BlockChain"], Height["BlockChair"], Height["BTC.com"], Height["Node"], Hash["Etherscan"], Hash["BlockChain"], Hash["BlockChair"], Hash["BTC.com"], Hash["Node"])
+		if err != nil {
 			log.Error(err)
 			panic(err)
 		}

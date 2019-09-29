@@ -18,5 +18,5 @@ package main
 import "github.com/jiangjinyuan/explorerBlockHeightMonitor/cmd"
 
 func main() {
-  cmd.Execute()
+	cmd.Execute()
 }

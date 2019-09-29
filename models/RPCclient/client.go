@@ -1,8 +1,6 @@
 package RPCclient
 
 import (
-	//"encoding/json"
-	//"fmt"
 	rpc "github.com/KeisukeYamashita/go-jsonrpc"
 	log "github.com/sirupsen/logrus"
 	"strconv"
@@ -15,23 +13,24 @@ type BasicAuth struct {
 
 type Client struct {
 	*rpc.RPCClient
-	height int64
+	height    int64
 	ethHeight string
 }
 
 type EthGetBlockHash struct {
-	Hash string `json:"hash"`
+	Hash   string `json:"hash"`
 	Height string `json:"number"`
 }
 
-func(c *Client)NewRPCClient(endpoint string, basicAuth *BasicAuth) {
+func (c *Client) NewRPCClient(endpoint string, basicAuth *BasicAuth) {
 	c.RPCClient = rpc.NewRPCClient(endpoint)
 	c.RPCClient.SetBasicAuth(basicAuth.Username, basicAuth.Password)
 }
+
 //GetBlockCount gets the latest block height.
 func (c *Client) GetBlockCount(coin string) int64 {
 	method := ""
-	out:=int64(0)
+	out := int64(0)
 	var resp *rpc.RPCResponse
 	var err error
 	switch coin {
@@ -46,8 +45,12 @@ func (c *Client) GetBlockCount(coin string) int64 {
 			log.Error(resp.Error)
 			return -1
 		}
-		resp.GetObject(&c.height)
-		out=c.height
+		err = resp.GetObject(&c.height)
+		if err != nil {
+			log.Error("err")
+			return -1
+		}
+		out = c.height
 	case "eth":
 		method = "eth_blockNumber"
 		resp, err = c.RPCClient.Call(method)
@@ -60,7 +63,7 @@ func (c *Client) GetBlockCount(coin string) int64 {
 			return -1
 		}
 		resp.GetObject(&c.ethHeight)
-		out,_=strconv.ParseInt(c.ethHeight, 0, 64)
+		out, _ = strconv.ParseInt(c.ethHeight, 0, 64)
 	}
 
 	return out
@@ -75,7 +78,7 @@ func (c *Client) GetBlockHash(coin string) string {
 	switch coin {
 	case "btc", "bch", "ltc":
 		method = "getblockhash"
-		resp, err = c.RPCClient.Call(method,c.height)
+		resp, err = c.RPCClient.Call(method, c.height)
 		if err != nil {
 			log.Error(err)
 			return "-1"
@@ -84,11 +87,15 @@ func (c *Client) GetBlockHash(coin string) string {
 			log.Error(resp.Error)
 			return "-1"
 		}
-		resp.GetObject(&hash)
+		err = resp.GetObject(&hash)
+		if err != nil {
+			log.Error(err)
+			return "-1"
+		}
 
 	case "eth":
 		method = "eth_getBlockByNumber"
-		resp, err = c.RPCClient.Call(method,c.ethHeight,true)
+		resp, err = c.RPCClient.Call(method, c.ethHeight, true)
 		if err != nil {
 			log.Error(err)
 			return "-1"
@@ -99,10 +106,7 @@ func (c *Client) GetBlockHash(coin string) string {
 		}
 		var count map[string]string
 		resp.GetObject(&count)
-		hash= count["hash"]
+		hash = count["hash"]
 	}
 	return hash
 }
-
-
-

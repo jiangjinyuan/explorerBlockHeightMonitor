@@ -1,0 +1,13 @@
+# at https://docs.docker.com/compose/compose-file/
+version: '3.3'
+services:
+  explorer_block_height_monitor:
+    container_name: explorer_block_height_monitor
+    image: explorer_block_height_monitor
+    restart: always
+    entrypoint: "/app/explorerBlockHeightMonitor GeneralCoin --coin btc"
+    volumes:
+      - ./configs/config.yaml:/app/configs/config.yaml
+      - ./logs:/app/logs
+    environment:
+      CONFIGOR_ENV: "production"

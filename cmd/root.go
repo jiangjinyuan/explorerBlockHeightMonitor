@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"fmt"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/spf13/cobra"
 	"os"
 	"strings"
 )
 
 var cfgFile string
+
 var coin string
 
 var rootCmd = &cobra.Command{
@@ -29,7 +30,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "configs/config", "config file (default is $HOME/.blockHeightMonitor.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "configs/config", "config file (default is $HOME/config.yaml)")
 	rootCmd.PersistentFlags().StringVar(&coin, "coin", "btc", "choose coin")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

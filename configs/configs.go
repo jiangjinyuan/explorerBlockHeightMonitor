@@ -25,35 +25,35 @@ type BTC struct {
 	BlockChain string
 	BlockChair string
 	ViaBtc     string
-	BTCcom string
+	BTCcom     string
 }
 
 type BCH struct {
 	BlockChair string
 	Bitcoin    string
 	ViaBtc     string
-	BTCcom string
+	BTCcom     string
 }
 
 type LTC struct {
 	BlockChair  string
 	ViaBtc      string
 	BlockCypher string
-	BTCcom string
+	BTCcom      string
 }
 
 type ETH struct {
 	Etherscan  string
 	BlockChain string
 	BlockChair string
-	BTCcom string
+	BTCcom     string
 }
 
 type ETC struct {
-	Gastracker string
-	BlockScout string
+	Gastracker       string
+	BlockScout       string
 	EtcBlockExplorer string
-	BTCcom string
+	BTCcom           string
 }
 
 type BtcNode struct {
