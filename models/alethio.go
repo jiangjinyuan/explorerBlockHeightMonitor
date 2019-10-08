@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/util"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 )
 
 type Alethio struct {
-	Height int64 `json:"number"`
+	Height int64 `mapstructure:"height"`
 }
 
 func (b *Alethio) GetBlockInfo() {
@@ -22,15 +23,10 @@ func (b *Alethio) Unmarshal(body []byte) {
 	if err1 != nil {
 		log.Error(err1)
 	}
-	//fmt.Println(data)
 	temp := data["data"].(map[string]interface{})
 	dat := temp["attributes"]
-	out, err2 := json.Marshal(dat)
+	err2 := mapstructure.Decode(dat, &b)
 	if err2 != nil {
-		log.Error(err2)
-	}
-	err3 := json.Unmarshal(out, &b)
-	if err3 != nil {
-		log.Error(err3)
+		panic(err2)
 	}
 }
