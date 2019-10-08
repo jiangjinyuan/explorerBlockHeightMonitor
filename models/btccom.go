@@ -36,7 +36,7 @@ func (b *BTCcom) Unmarshal(body []byte) {
 	if err1 != nil {
 		log.Error(err1)
 	}
-	temp := data["block"].(map[string]interface{})
+	temp := data["data"].(map[string]interface{})
 	out, err2 := json.Marshal(temp)
 	if err2 != nil {
 		log.Error(err2)
