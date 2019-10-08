@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/util"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 )
 
 type Etherscan struct {
-	Height string `json:"number"`
-	Hash   string `json:"hash"`
+	Height string `mapstructure:"number"`
+	Hash   string `mapstructure:"hash"`
 }
 
 func (b *Etherscan) GetBlockInfo() {
@@ -24,12 +25,8 @@ func (b *Etherscan) Unmarshal(body []byte) {
 		log.Error(err1)
 	}
 	temp := data["result"].(map[string]interface{})
-	out, err2 := json.Marshal(temp)
+	err2 := mapstructure.Decode(temp, &b)
 	if err2 != nil {
-		log.Error(err2)
-	}
-	err3 := json.Unmarshal(out, &b)
-	if err3 != nil {
-		log.Error(err3)
+		panic(err2)
 	}
 }
