@@ -173,33 +173,33 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	switch coin {
 	case "btc":
 		N = configs.Config.AlarmThreshold.Btc
-		text["0"] = fmt.Sprintf("The BTC of BTC.com(v4)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The BTC of BTC.com(v3)'s blockHeight:")
 		count["BlockChain"] = b.Height["BlockChain"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 
 	case "bch":
 		N = configs.Config.AlarmThreshold.Bch
-		text["0"] = fmt.Sprintf("The BCH of BTC.com(v4)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The BCH of BTC.com(v3)'s blockHeight:")
 		count["Bitcoin"] = b.Height["Bitcoin"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 
 	case "ltc":
 		N = configs.Config.AlarmThreshold.Ltc
-		text["0"] = fmt.Sprintf("The LTC of BTC.com(v4)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The LTC of BTC.com(v3)'s blockHeight:")
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["BlockCypher"] = b.Height["BlockCypher"] - b.Height["BTCcom"]
 	case "eth":
 		N = configs.Config.AlarmThreshold.Eth
-		text["0"] = fmt.Sprintf("The ETH of BTC.com(v4)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The ETH of BTC.com(v3)'s blockHeight:")
 		count["Etherscan"] = b.Height["Etherscan"] - b.Height["BTCcom"]
 		count["BlockScout"] = b.Height["BlockScout"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 	case "etc":
 		N = configs.Config.AlarmThreshold.Etc
-		text["0"] = fmt.Sprintf("The ETC of BTC.com(v4)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The ETC of BTC.com(v3)'s blockHeight:")
 		count["Gastracker"] = b.Height["Gastracker"] - b.Height["BTCcom"]
 		count["EtcBlockExplorer"] = b.Height["EtcBlockExplorer"] - b.Height["BTCcom"]
 	}
