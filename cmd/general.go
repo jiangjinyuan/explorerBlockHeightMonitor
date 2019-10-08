@@ -14,6 +14,7 @@ func init(){
 var generalCoinCmd=&cobra.Command{
 	Use:   "GeneralCoin",
 	Short: "BTC/BCH/LTC/ETH/ETC Block Height Monitor",
+	Long: "This module can be used to monitor blockHeight of different coins by choosing different coins",
 	Run:   GeneralCoinHeightMonitor,
 }
 
