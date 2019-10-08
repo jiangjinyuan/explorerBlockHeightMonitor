@@ -29,12 +29,7 @@ func (b *BlockChainBtc) Unmarshal(body []byte) {
 }
 
 func (a *BlockChainEth) GetBlockInfo() {
-	/*body:=util.Get(configs.Config.EthApi.BlockChain)
-	fmt.Println(body)*/
-	//spew.Dump(configs.Config.EthApi)
-	//spew.Dump(configs.Config.EthApi.BlockChain)
 	body := util.GetHttpResponse("GET", configs.Config.EthApi.BlockChain)
-	//fmt.Println(string(body))
 	a.Unmarshal(body)
 }
 
