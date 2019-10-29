@@ -17,7 +17,7 @@ type BlockHeightMonitor struct {
 	Hash   map[string]string
 }
 
-func (b *BlockHeightMonitor) Run(coin string, db *sql.DB){
+func (b *BlockHeightMonitor) Run(coin string, db *sql.DB) {
 	b.Height = make(map[string]int64)
 	b.Hash = make(map[string]string)
 	switch coin {
@@ -145,20 +145,22 @@ func (b *BlockHeightMonitor) Run(coin string, db *sql.DB){
 		}()
 	}
 	b.wg.Add(1)
-	var temp4 models.BTCcom
-	temp4.GetBlockInfo(coin)
-	b.Height["BTCcom"] = temp4.Height
-	b.Hash["BTCcom"] = temp4.Hash
-	b.wg.Done()
+	go func() {
+		var temp4 models.BTCcom
+		temp4.GetBlockInfo(coin)
+		b.Height["BTCcom"] = temp4.Height
+		b.Hash["BTCcom"] = temp4.Hash
+		b.wg.Done()
+	}()
 
-	b.wg.Add(1)
+	/*b.wg.Add(1)
 	go func() {
 		var temp5 models.Node
 		temp5.GetBlockInfo(coin)
 		b.Height["Node"] = temp5.Height
 		b.Hash["Node"] = temp5.Hash
 		b.wg.Done()
-	}()
+	}()*/
 	b.wg.Wait()
 	util.Insert(db, coin, b.Height, b.Hash)
 	b.Compare(coin)
@@ -167,14 +169,14 @@ func (b *BlockHeightMonitor) Run(coin string, db *sql.DB){
 }
 
 func (b BlockHeightMonitor) Compare(coin string) {
-	text := make(map[string]string)  //write the information which to send
-	count := make(map[string]int64)  //Record the blockHeight difference between other explorers and BTC.com
-	var N int64   //the AlarmThreshold of every coin
+	text := make(map[string]string) //write the information which to send
+	count := make(map[string]int64) //Record the blockHeight difference between other explorers and BTC.com
+	var N int64                     //the AlarmThreshold of every coin
 	switch coin {
 	case "btc":
 		N = configs.Config.AlarmThreshold.Btc
 		text["0"] = fmt.Sprintf("The BTC of BTC.com(v3)'s latest blockHeight: ")
-		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
+		text["0"] += fmt.Sprintf("%d", b.Height["BTCcom"])
 		count["BlockChain"] = b.Height["BlockChain"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
@@ -182,7 +184,7 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	case "bch":
 		N = configs.Config.AlarmThreshold.Bch
 		text["0"] = fmt.Sprintf("The BCH of BTC.com(v3)'s latest blockHeight: ")
-		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
+		text["0"] += fmt.Sprintf("%d", b.Height["BTCcom"])
 		count["Bitcoin"] = b.Height["Bitcoin"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
@@ -190,21 +192,21 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	case "ltc":
 		N = configs.Config.AlarmThreshold.Ltc
 		text["0"] = fmt.Sprintf("The LTC of BTC.com(v3)'s latest blockHeight: ")
-		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
+		text["0"] += fmt.Sprintf("%d", b.Height["BTCcom"])
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["BlockCypher"] = b.Height["BlockCypher"] - b.Height["BTCcom"]
 	case "eth":
 		N = configs.Config.AlarmThreshold.Eth
 		text["0"] = fmt.Sprintf("The ETH of BTC.com(v3)'s latest blockHeight: ")
-		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
+		text["0"] += fmt.Sprintf("%d", b.Height["BTCcom"])
 		count["Etherscan"] = b.Height["Etherscan"] - b.Height["BTCcom"]
 		count["BlockScout"] = b.Height["BlockScout"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 	case "etc":
 		N = configs.Config.AlarmThreshold.Etc
 		text["0"] = fmt.Sprintf("The ETC of BTC.com(v3)'s latest blockHeight: ")
-		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
+		text["0"] += fmt.Sprintf("%d", b.Height["BTCcom"])
 		count["Gastracker"] = b.Height["Gastracker"] - b.Height["BTCcom"]
 		count["EtcBlockExplorer"] = b.Height["EtcBlockExplorer"] - b.Height["BTCcom"]
 	}
@@ -228,16 +230,15 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	if len(text) == 1 {
 		return
 	}
-	textHeight:=""
+	textHeight := ""
 	for key, result := range b.Height {
-		if key != "Node"{
-			tempHeight:=fmt.Sprintf(key+":")
-			tempHeight+=fmt.Sprintf("%d  ",result)
-			textHeight+=tempHeight
-		}
+		tempHeight := fmt.Sprintf(key + ":")
+		tempHeight += fmt.Sprintf("%d  ", result)
+		textHeight += tempHeight
+
 	}
 	fmt.Println(textHeight)
 
-	senders.SlackPoster.SendText(text," All latest blockHeight——"+textHeight)  //send alarm info to slack channel
-	senders.EmailPublisher.SendText(text," All latest blockHeight——"+textHeight) //send alarm info to email
+	senders.SlackPoster.SendText(text, " All latest blockHeight——"+textHeight)    //send alarm info to slack channel
+	senders.EmailPublisher.SendText(text, " All latest blockHeight——"+textHeight) //send alarm info to email
 }
