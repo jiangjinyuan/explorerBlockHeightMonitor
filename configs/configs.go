@@ -19,6 +19,7 @@ var Config = struct {
 	Email          Email
 	DB             DB
 	AlarmThreshold AlarmThreshold
+	TraverseSleepTime TraverseSleepTime
 }{}
 
 type BTC struct {
@@ -113,6 +114,14 @@ type AlarmThreshold struct {
 	Ltc int64
 	Eth int64
 	Etc int64
+}
+
+type TraverseSleepTime struct {
+	Btc int
+	Bch int
+	Ltc int
+	Eth int
+	Etc int
 }
 
 func InitConfig(files string) {
