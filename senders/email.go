@@ -10,7 +10,7 @@ type EmailSender struct {
 
 var EmailPublisher EmailSender
 
-func (e *EmailSender) SendText(text map[string]string) {
+func (e *EmailSender) SendText(text map[string]string,height string) {
 	if !configs.Config.Email.IsEnable {
 		return
 	}
@@ -24,7 +24,8 @@ func (e *EmailSender) SendText(text map[string]string) {
 			textBody += result
 		}
 	}
-	textBody = temp + textBody
+	textBody="<p>" + textBody + "<p>"
+	textBody = temp + textBody + height
 	m := gomail.NewMessage()
 	//sender
 	m.SetAddressHeader("From", configs.Config.Email.SenderName, "explorerBlockHeightMonitor")

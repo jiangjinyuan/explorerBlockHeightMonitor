@@ -12,7 +12,7 @@ type SlackSender struct {
 
 var SlackPoster SlackSender
 
-func (s SlackSender) SendText(text map[string]string) {
+func (s SlackSender) SendText(text map[string]string, height string) {
 	if !configs.Config.Slack.IsEnable {
 		return
 	}
@@ -26,7 +26,8 @@ func (s SlackSender) SendText(text map[string]string) {
 			textBody += result
 		}
 	}
-	textBody = temp + textBody
+	textBody = textBody + "\n"
+	textBody = temp + textBody + height
 	data := "{\"text\":\"" + textBody + "\"}"
 	_, err := http.Post(configs.Config.Slack.WebHookURL, "application/json;charset=utf-8",
 		bytes.NewBuffer([]byte(data)))
