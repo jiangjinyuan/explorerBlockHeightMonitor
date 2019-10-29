@@ -17,7 +17,7 @@ type BlockHeightMonitor struct {
 	Hash   map[string]string
 }
 
-func (b *BlockHeightMonitor) Run(coin string, db *sql.DB) {
+func (b *BlockHeightMonitor) Run(coin string, db *sql.DB){
 	b.Height = make(map[string]int64)
 	b.Hash = make(map[string]string)
 	switch coin {
@@ -162,8 +162,8 @@ func (b *BlockHeightMonitor) Run(coin string, db *sql.DB) {
 	b.wg.Wait()
 	util.Insert(db, coin, b.Height, b.Hash)
 	b.Compare(coin)
-	fmt.Println(b.Height)
-	fmt.Println(b.Hash)
+	//fmt.Println(b.Height)
+	//fmt.Println(b.Hash)
 }
 
 func (b BlockHeightMonitor) Compare(coin string) {
@@ -173,33 +173,38 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	switch coin {
 	case "btc":
 		N = configs.Config.AlarmThreshold.Btc
-		text["0"] = fmt.Sprintf("The BTC of BTC.com(v3)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The BTC of BTC.com(v3)'s latest blockHeight: ")
+		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
 		count["BlockChain"] = b.Height["BlockChain"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 
 	case "bch":
 		N = configs.Config.AlarmThreshold.Bch
-		text["0"] = fmt.Sprintf("The BCH of BTC.com(v3)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The BCH of BTC.com(v3)'s latest blockHeight: ")
+		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
 		count["Bitcoin"] = b.Height["Bitcoin"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 
 	case "ltc":
 		N = configs.Config.AlarmThreshold.Ltc
-		text["0"] = fmt.Sprintf("The LTC of BTC.com(v3)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The LTC of BTC.com(v3)'s latest blockHeight: ")
+		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
 		count["ViaBtc"] = b.Height["ViaBtc"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 		count["BlockCypher"] = b.Height["BlockCypher"] - b.Height["BTCcom"]
 	case "eth":
 		N = configs.Config.AlarmThreshold.Eth
-		text["0"] = fmt.Sprintf("The ETH of BTC.com(v3)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The ETH of BTC.com(v3)'s latest blockHeight: ")
+		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
 		count["Etherscan"] = b.Height["Etherscan"] - b.Height["BTCcom"]
 		count["BlockScout"] = b.Height["BlockScout"] - b.Height["BTCcom"]
 		count["BlockChair"] = b.Height["BlockChair"] - b.Height["BTCcom"]
 	case "etc":
 		N = configs.Config.AlarmThreshold.Etc
-		text["0"] = fmt.Sprintf("The ETC of BTC.com(v3)'s blockHeight:")
+		text["0"] = fmt.Sprintf("The ETC of BTC.com(v3)'s latest blockHeight: ")
+		text["0"] += fmt.Sprintf("%d",b.Height["BTCcom"])
 		count["Gastracker"] = b.Height["Gastracker"] - b.Height["BTCcom"]
 		count["EtcBlockExplorer"] = b.Height["EtcBlockExplorer"] - b.Height["BTCcom"]
 	}
@@ -209,13 +214,28 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	for key, result := range count {
 		if result >= N {
 			text[key] = fmt.Sprintf("Behind the " + key)
-			text[key] += fmt.Sprintf(" %d blocks;", result)
+			text[key] += fmt.Sprintf(" %d blocks,", result)
+			text[key] += fmt.Sprintf(" %s's latest blockHeight is ", key)
+			text[key] += fmt.Sprintf(" %d;", b.Height[key])
+		} else if result < 0 {
+			text[key] = fmt.Sprintf("Beyond the " + key)
+			text[key] += fmt.Sprintf(" %d blocks,", -result)
+			text[key] += fmt.Sprintf(" %s's latest blockHeight is ", key)
+			text[key] += fmt.Sprintf(" %d;", b.Height[key])
 		}
 	}
+
 	if len(text) == 1 {
 		return
 	}
-	//fmt.Println(text)
-	senders.SlackPoster.SendText(text)  //send alarm info to slack channel
-	senders.EmailPublisher.SendText(text) //send alarm info to email
+	textHeight:=""
+	for key, result := range b.Height {
+		tempHeight:=fmt.Sprintf(key+":")
+		tempHeight+=fmt.Sprintf("%d  ",result)
+		textHeight+=tempHeight
+	}
+	fmt.Println(textHeight)
+
+	senders.SlackPoster.SendText(text," All latest blockHeight——"+textHeight)  //send alarm info to slack channel
+	senders.EmailPublisher.SendText(text," All latest blockHeight——"+textHeight) //send alarm info to email
 }
