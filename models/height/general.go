@@ -217,12 +217,12 @@ func (b BlockHeightMonitor) Compare(coin string) {
 			text[key] += fmt.Sprintf(" %d blocks,", result)
 			text[key] += fmt.Sprintf(" %s's latest blockHeight is ", key)
 			text[key] += fmt.Sprintf(" %d;", b.Height[key])
-		} else if result < 0 {
+		} /*else if result < 0 {
 			text[key] = fmt.Sprintf("Beyond the " + key)
 			text[key] += fmt.Sprintf(" %d blocks,", -result)
 			text[key] += fmt.Sprintf(" %s's latest blockHeight is ", key)
 			text[key] += fmt.Sprintf(" %d;", b.Height[key])
-		}
+		}*/
 	}
 
 	if len(text) == 1 {
