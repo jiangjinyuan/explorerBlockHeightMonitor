@@ -209,7 +209,7 @@ func (b BlockHeightMonitor) Compare(coin string) {
 		count["EtcBlockExplorer"] = b.Height["EtcBlockExplorer"] - b.Height["BTCcom"]
 	}
 
-	count["Node"] = b.Height["Node"] - b.Height["BTCcom"]
+	//count["Node"] = b.Height["Node"] - b.Height["BTCcom"]
 
 	for key, result := range count {
 		if result >= N {
@@ -230,9 +230,11 @@ func (b BlockHeightMonitor) Compare(coin string) {
 	}
 	textHeight:=""
 	for key, result := range b.Height {
-		tempHeight:=fmt.Sprintf(key+":")
-		tempHeight+=fmt.Sprintf("%d  ",result)
-		textHeight+=tempHeight
+		if key != "Node"{
+			tempHeight:=fmt.Sprintf(key+":")
+			tempHeight+=fmt.Sprintf("%d  ",result)
+			textHeight+=tempHeight
+		}
 	}
 	fmt.Println(textHeight)
 
