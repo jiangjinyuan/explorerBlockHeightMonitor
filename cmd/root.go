@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/dbs"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -42,4 +43,13 @@ func initConfig() {
 	if coins != "" {
 		coins = configs.Config.SupportCoins
 	}
+
+	// init mysql
+	config := make(map[string]configs.MySQLDSN)
+	for i := range configs.Config.ExplorerDatabase {
+		databaseConfig := configs.Config.ExplorerDatabase[i]
+		configs.AddDatabaseConfig(&databaseConfig, config)
+	}
+	// init redis
+	_ = dbs.InitRedisDB(configs.Config.Redis.Redis.Address, configs.Config.Redis.Redis.Password)
 }

@@ -2,9 +2,10 @@ package senders
 
 import (
 	"bytes"
+	"net/http"
+
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type SlackSender struct {
