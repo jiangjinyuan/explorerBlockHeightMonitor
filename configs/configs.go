@@ -16,7 +16,9 @@ var Config = struct {
 		Redis   RedisDB
 		Cluster RedisClusterDB
 	}
-	SupportCoins string
+	SupportCoins     string
+	MonitorExplorers []string
+	MonitorCoins     []string
 }{}
 
 type Slack struct {

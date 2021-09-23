@@ -3,9 +3,13 @@ package monitor
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"reflect"
 	"strconv"
+	"strings"
+
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/models"
 
@@ -38,9 +42,9 @@ func NewBlockHeightMonitorRunner(explorerJsonConfig string) (*blockHeightMonitor
 
 	for _, value := range runner.confList {
 		log.WithField("step", "init-list-explorers").WithField("name", value.Name).
-			WithField("coin", value.Coin).WithField("JsonPattern",
-			value.JsonPattern).WithField("url", value.Url).WithField("enabled",
-			value.Enabled)
+			WithField("coin", value.Coin).WithField("HeightJsonPattern",
+			value.HeightJsonPattern).WithField("HashJsonPattern", value.HashJsonPattern).
+			WithField("url", value.Url).WithField("enabled", value.Enabled)
 	}
 
 	return runner, nil
@@ -81,32 +85,32 @@ func (r *blockHeightMonitorRunner) Run() error {
 		return errors.New("explorer config is empty")
 	}
 
-	r.RunGetBlockHeight(r.confList)
+	go r.RunGetBlockInfo(r.confList)
+
+	go r.RunCheckBlockHeight(r.confList)
 
 	return nil
 }
 
 // RunGetBlockHeight 开始运行，获取浏览器块高
-func (r *blockHeightMonitorRunner) RunGetBlockHeight(pConfList []*explorer.Explorer) {
+func (r *blockHeightMonitorRunner) RunGetBlockInfo(pConfList []*explorer.Explorer) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Error("panic", err)
 		}
 	}()
 
-	var result []*models.BlockHeight
+	var result []*models.Block
 	for _, conf := range pConfList {
 		log.Info(conf.Name, conf.Coin, *conf)
 		if conf.Enabled {
-			height, err := r.GetExplorerBlockHeight(conf)
+			block := &models.Block{}
+			block, err := r.GetExplorerBlockInfo(conf)
 			if err != nil {
 				continue
 			}
-			block := &models.BlockHeight{
-				Coin:         conf.Coin,
-				ExplorerName: conf.Name,
-				Height:       height,
-			}
+			block.Coin = conf.Coin
+			block.ExplorerName = conf.Name
 			result = append(result, block)
 		}
 	}
@@ -117,35 +121,46 @@ func (r *blockHeightMonitorRunner) RunGetBlockHeight(pConfList []*explorer.Explo
 	}
 }
 
-// GetExplorerBlockHeight 获取浏览器块高
-func (r *blockHeightMonitorRunner) GetExplorerBlockHeight(pConf *explorer.Explorer) (int64, error) {
+// GetExplorerBlockInfo 获取浏览器块高
+func (r *blockHeightMonitorRunner) GetExplorerBlockInfo(pConf *explorer.Explorer) (result *models.Block, err error) {
 	// 默认 json 格式
-	return r.GetExplorerBlockHeightByJsonFormat(pConf)
+	return r.GetExplorerBlockInfoByJsonFormat(pConf)
 }
 
-// GetPoolHashrateByJsonFormat
-func (r *blockHeightMonitorRunner) GetExplorerBlockHeightByJsonFormat(pConf *explorer.Explorer) (blockHeight int64, err error) {
+// GetExplorerBlockInfoByJsonFormat
+func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJsonFormat(pConf *explorer.Explorer) (result *models.Block, err error) {
+	result = &models.Block{
+		Coin:         pConf.Coin,
+		ExplorerName: pConf.Name,
+	}
 	body, err := client.Client.Get(pConf.Url, pConf.CustomHeaders)
 	if err != nil {
 		log.Error(err)
-		return blockHeight, err
+		return result, err
 	}
 	log.WithField("body", body).Debug("get body")
 
 	var object interface{}
 	if err := json.Unmarshal(body, &object); err != nil {
 		log.Error(err)
-		return blockHeight, err
+		return result, err
 	}
-
-	h, err := jsonpath.Get(pConf.JsonPattern, object)
+	// parse block height
+	height, err := jsonpath.Get(pConf.HeightJsonPattern, object)
 	if err != nil {
 		log.Error(err)
-		return blockHeight, err
+		return result, err
 	}
+	result.Height = r.ParseBlockHeight(height)
+	// parse block hash
+	hash, err := jsonpath.Get(pConf.HashJsonPattern, object)
+	if err != nil {
+		log.Error(err)
+		return result, err
+	}
+	result.Hash = hash.(string)
 
-	blockHeight = r.ParseBlockHeight(h)
-	return blockHeight, nil
+	return result, nil
 }
 
 // ParseBlockHeight json 解析块高
@@ -162,4 +177,35 @@ func (r *blockHeightMonitorRunner) ParseBlockHeight(object interface{}) (blockHe
 	}
 
 	return
+}
+
+// RunCheckBlockHeight 开始运行，浏览器块高检查
+func (r *blockHeightMonitorRunner) RunCheckBlockHeight(pConfList []*explorer.Explorer) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error("panic", err)
+		}
+	}()
+
+	// 获取块高
+	blockMap, err := models.GetExplorerBlockInfo(configs.Config.MonitorCoins)
+	if err != nil {
+		panic(err)
+	}
+
+	// compare
+	for _, coin := range configs.Config.MonitorCoins {
+		r.CompareBlockHeight(coin, blockMap)
+	}
+}
+
+func (r *blockHeightMonitorRunner) CompareBlockHeight(coin string, blockMap map[string]*models.Block) {
+	for key, block := range blockMap {
+		coinExplorerNameList := strings.Split(key, "-")
+		if coin == coinExplorerNameList[0] {
+			fmt.Println(block)
+			// send message to channel
+
+		}
+	}
 }
