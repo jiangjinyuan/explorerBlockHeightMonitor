@@ -1,27 +1,44 @@
 appname: ""
 
-Slack:
-  WebHookURL: "https://hooks.slack.com/services/"
-  IsEnable: false
+slack:
+  webhookurl: "https://hooks.slack.com/services/*****"
+  isenable: true
 
-Email:
-  SenderName: "***@gamil.com"
-  SenderPassword: "*********"
-  Host: "smtp.gmail.com"
-  Port: 587
-  IsEnable: false
+email:
+  sendername: "***@gamil.com"
+  senderpassword: "*********"
+  host: "smtp.gmail.com"
+  port: 587
+  isenable: true
 
-DB:
-  Driver: mysql
-  UserName: root
-  Password: 123456
-  Host: 127.0.0.1
-  Port: 3307
-  Schema: latest_block_height
+explorerdatabase:
+  general:
+    read:
+      name: "explorer:general:read"
+      dsn: "root:123456@tcp(127.0.0.1:3306)/**"
+    write:
+      name: "explorer:general:write"
+      dsn: "root:123456@tcp(127.0.0.1:3306)/**"
 
-AlarmThreshold:
-  Btc: 2
-  Bch: 2
-  Ltc: 2
-  Eth: 3
-  Etc: 3
+alarmthreshold:
+  btc: 2
+  bch: 2
+  bsv: 2
+  ltc: 2
+  eth: 5
+
+monitorexplorers:
+  - "btc.com"
+
+monitorcoins:
+  - "btc"
+  - "bch"
+  - "ltc"
+  - "bsv"
+  - "eth"
+
+interval: 60
+
+health:
+  port: 8080
+  intervalseconds: 60
