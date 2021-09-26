@@ -1,14 +1,17 @@
 package configs
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 var Config = struct {
+	AppName           string
 	Slack             Slack
 	Email             Email
-	AlarmThreshold    AlarmThreshold
-	TraverseSleepTime TraverseSleepTime
+	AlarmThreshold    map[string]int64
+	TraverseSleepTime map[string]int64
 	ExplorerDatabase  map[string]MySQLDB
 	Redis             struct {
 		Prefix  string
@@ -19,6 +22,8 @@ var Config = struct {
 	SupportCoins     string
 	MonitorExplorers []string
 	MonitorCoins     []string
+	Interval         int
+	Health           Health
 }{}
 
 type Slack struct {
@@ -34,38 +39,20 @@ type Email struct {
 	IsEnable       bool
 }
 
-type DB struct {
-	Driver   string
-	UserName string
-	Password string
-	Host     string
-	Port     string
-	Schema   string
-}
-
-type AlarmThreshold struct {
-	Btc int64
-	Bch int64
-	Ltc int64
-	Eth int64
-	Etc int64
-}
-
-type TraverseSleepTime struct {
-	Btc int
-	Bch int
-	Ltc int
-	Eth int
-	Etc int
+type Health struct {
+	Port            int
+	IntervalSeconds int
 }
 
 func InitConfig(files string) {
-	viper.SetConfigName(files)  // 设置配置文件名 (不带后缀)
-	viper.AddConfigPath(".")    // 第一个搜索路径
-	err := viper.ReadInConfig() // 读取配置数据
-	if err != nil {
+	viper.SetConfigName(files) // 设置配置文件名 (不带后缀)
+	viper.AddConfigPath(".")   // 第一个搜索路径
+	if err := viper.ReadInConfig(); err != nil {
 		panic(err)
 	}
-	viper.Unmarshal(&Config) // 将配置信息绑定到结构体上
-	//fmt.Println(Config)
+	if err := viper.Unmarshal(&Config); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(&Config)
 }

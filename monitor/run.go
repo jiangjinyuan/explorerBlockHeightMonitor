@@ -7,10 +7,14 @@ import (
 	"io/ioutil"
 	"reflect"
 	"strconv"
-	"strings"
+	"sync"
+	"time"
+
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/utils"
+
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/senders"
 
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
-
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/models"
 
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/client"
@@ -21,8 +25,10 @@ import (
 )
 
 type blockHeightMonitorRunner struct {
+	once               sync.Once
 	explorerJSONConfig string
 	confList           []*explorer.Explorer
+	exit               chan struct{}
 }
 
 type ExplorerConfig struct {
@@ -33,6 +39,7 @@ type ExplorerConfig struct {
 func NewBlockHeightMonitorRunner(explorerJsonConfig string) (*blockHeightMonitorRunner, error) {
 	runner := &blockHeightMonitorRunner{
 		explorerJSONConfig: explorerJsonConfig,
+		exit:               make(chan struct{}),
 	}
 
 	if err := runner.loadExplorerJsonByFile(); err != nil {
@@ -85,11 +92,39 @@ func (r *blockHeightMonitorRunner) Run() error {
 		return errors.New("explorer config is empty")
 	}
 
-	go r.RunGetBlockInfo(r.confList)
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-	go r.RunCheckBlockHeight(r.confList)
+	go func() {
+		defer wg.Done()
+		r.RunGetBlockInfo(r.confList)
+	}()
+
+	go func() {
+		defer wg.Done()
+		r.RunCheckBlockHeight(r.confList)
+	}()
+
+	wg.Wait()
 
 	return nil
+}
+
+// 定时器开始运行
+func (r *blockHeightMonitorRunner) Start() error {
+	timer := time.NewTicker(time.Duration(configs.Config.Interval) * time.Second)
+	for {
+		select {
+		case <-timer.C:
+			if err := r.Run(); err != nil {
+				log.Errorf("run get block height failed, error: %v ", err)
+			}
+
+		case <-r.exit:
+			log.Info("run get block height exit...")
+			return nil
+		}
+	}
 }
 
 // RunGetBlockHeight 开始运行，获取浏览器块高
@@ -102,7 +137,7 @@ func (r *blockHeightMonitorRunner) RunGetBlockInfo(pConfList []*explorer.Explore
 
 	var result []*models.Block
 	for _, conf := range pConfList {
-		log.Info(conf.Name, conf.Coin, *conf)
+		log.Infof("explorer name:%s, coin name:%s, conf:%v", conf.Name, conf.Coin, *conf)
 		if conf.Enabled {
 			block := &models.Block{}
 			block, err := r.GetExplorerBlockInfo(conf)
@@ -111,6 +146,7 @@ func (r *blockHeightMonitorRunner) RunGetBlockInfo(pConfList []*explorer.Explore
 			}
 			block.Coin = conf.Coin
 			block.ExplorerName = conf.Name
+			block.Link = conf.Url
 			result = append(result, block)
 		}
 	}
@@ -138,13 +174,14 @@ func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJsonFormat(pConf *explo
 		log.Error(err)
 		return result, err
 	}
-	log.WithField("body", body).Debug("get body")
 
 	var object interface{}
 	if err := json.Unmarshal(body, &object); err != nil {
 		log.Error(err)
 		return result, err
 	}
+	log.Debugf("body:%v", object)
+
 	// parse block height
 	height, err := jsonpath.Get(pConf.HeightJsonPattern, object)
 	if err != nil {
@@ -152,6 +189,7 @@ func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJsonFormat(pConf *explo
 		return result, err
 	}
 	result.Height = r.ParseBlockHeight(height)
+
 	// parse block hash
 	hash, err := jsonpath.Get(pConf.HashJsonPattern, object)
 	if err != nil {
@@ -169,11 +207,11 @@ func (r *blockHeightMonitorRunner) ParseBlockHeight(object interface{}) (blockHe
 	switch blockHeightType.String() {
 	case "int64":
 		blockHeight = object.(int64)
-		break
 	case "string":
 		blockHeightStr := object.(string)
 		blockHeight, _ = strconv.ParseInt(blockHeightStr, 10, 64)
-		break
+	case "float64":
+		blockHeight = int64(object.(float64))
 	}
 
 	return
@@ -187,25 +225,95 @@ func (r *blockHeightMonitorRunner) RunCheckBlockHeight(pConfList []*explorer.Exp
 		}
 	}()
 
-	// 获取块高
-	blockMap, err := models.GetExplorerBlockInfo(configs.Config.MonitorCoins)
+	// get the block height list
+	blockList, err := models.GetExplorerBlockInfo(configs.Config.MonitorCoins)
 	if err != nil {
-		panic(err)
+		log.Error("get explorer block info failed", err)
+		return
 	}
 
 	// compare
 	for _, coin := range configs.Config.MonitorCoins {
-		r.CompareBlockHeight(coin, blockMap)
+		coinBlockMap := make(map[string]*models.Block)
+		for _, value := range blockList {
+			if coin != value.Coin {
+				continue
+			}
+
+			if _, exist := coinBlockMap[value.ExplorerName]; exist {
+				continue
+			}
+			coinBlockMap[value.ExplorerName] = value
+		}
+
+		r.CompareBlockHeight(coinBlockMap)
 	}
 }
 
-func (r *blockHeightMonitorRunner) CompareBlockHeight(coin string, blockMap map[string]*models.Block) {
-	for key, block := range blockMap {
-		coinExplorerNameList := strings.Split(key, "-")
-		if coin == coinExplorerNameList[0] {
-			fmt.Println(block)
-			// send message to channel
-
+func (r *blockHeightMonitorRunner) CompareBlockHeight(coinBlockMap map[string]*models.Block) {
+	for _, explorerName := range configs.Config.MonitorExplorers {
+		mBlock, exist := coinBlockMap[explorerName]
+		if !exist {
+			log.Errorf("the monitor explorer %s not exist in config json file", explorerName)
+			continue
 		}
+
+		heightErrorCnt := 0
+		hashErrorCnt := 0
+		heightErrorMsg := fmt.Sprintf("Monitor Warning: %s (UTC) \n"+
+			"[coin: %s, explorer name: %s, height: %d, url: %s] block height behind others explorer. \n"+
+			"explorer list [name:height:link]:\n",
+			time.Now().UTC().Format(utils.UTCDatetime), mBlock.Coin, mBlock.ExplorerName, mBlock.Height, mBlock.Link)
+		hashErrorMsg := fmt.Sprintf("Monitor Warning:  %s (UTC) \n"+
+			"[coin: %s, explorer name: %s, height: %d, hash: %s, url: %s] block hash different from others explorer. \n"+
+			"explorer list [name:height:hash:link]:\n",
+			time.Now().UTC().Format(utils.UTCDatetime), mBlock.Coin, mBlock.ExplorerName, mBlock.Height, mBlock.Hash, mBlock.Link)
+		for key, value := range coinBlockMap {
+			if key != explorerName {
+				// check block height
+				if mBlock.Height < value.Height-configs.Config.AlarmThreshold[value.Coin] {
+					msg := fmt.Sprintf("%s:%d:%s \n", value.ExplorerName, value.Height, value.Link)
+					heightErrorMsg += msg
+					heightErrorCnt++
+				}
+
+				// check block hash
+				if mBlock.Height == value.Height && mBlock.Hash != value.Hash {
+					msg := fmt.Sprintf("%s:%d:%s:%s \n", value.ExplorerName, value.Height, value.Hash, value.Link)
+					hashErrorMsg += msg
+					hashErrorCnt++
+				}
+			}
+		}
+
+		var sender senders.Senders
+		if configs.Config.Slack.IsEnable {
+			sender = senders.NewSlackSender()
+		} else {
+			if configs.Config.Email.IsEnable {
+				sender = senders.NewEmailSender()
+			}
+		}
+
+		if heightErrorCnt > 0 {
+			// send message to channel
+			r.SendMessage(heightErrorMsg, sender)
+		}
+
+		if hashErrorCnt > 0 {
+			// send message to channel
+			r.SendMessage(hashErrorMsg, sender)
+		}
+
 	}
+}
+
+func (r *blockHeightMonitorRunner) SendMessage(msg string, sender senders.Senders) {
+	sender.Send(msg)
+}
+
+func (r *blockHeightMonitorRunner) Close() {
+	r.once.Do(func() {
+		close(r.exit)
+	})
 }

@@ -75,10 +75,10 @@
     {
       "name": "btc.com",
       "coin": "bsv",
-      "url": "",
-      "heightJsonPattern": "",
-      "hashJsonPattern": "",
-      "enabled": false
+      "url": "https://bsv-chain.api.btc.com/v3/block/latest",
+      "heightJsonPattern": "$.data.height",
+      "hashJsonPattern": "$.data.hash",
+      "enabled": true
     },
     {
       "name": "blockchair",
@@ -123,10 +123,10 @@
     {
       "name": "btc.com",
       "coin": "eth",
-      "url": "",
-      "heightJsonPattern": "$.data.height",
-      "hashJsonPattern": "$.data.hash",
-      "enabled": false
+      "url": "https://eth-chain.api.btc.com/v1/blocks?start=0&count=1",
+      "heightJsonPattern": "$.blocks[0].number",
+      "hashJsonPattern": "$.blocks[0].hash",
+      "enabled": true
     }
   ]
 }

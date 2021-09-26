@@ -10,8 +10,6 @@ import (
 
 var cfgFile string
 
-var coins string
-
 var rootCmd = &cobra.Command{
 	Use:   "blockHeightMonitor",
 	Short: "",
@@ -31,7 +29,6 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "configs/config", "config file (default is $HOME/config.yaml)")
-	rootCmd.PersistentFlags().StringVar(&coins, "coins", "", "choose coins, for example: btc,bch,bsv")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
@@ -40,16 +37,14 @@ func initConfig() {
 		configs.InitConfig(cfgFile)
 	}
 
-	if coins != "" {
-		coins = configs.Config.SupportCoins
-	}
-
 	// init mysql
 	config := make(map[string]configs.MySQLDSN)
 	for i := range configs.Config.ExplorerDatabase {
 		databaseConfig := configs.Config.ExplorerDatabase[i]
 		configs.AddDatabaseConfig(&databaseConfig, config)
 	}
+	dbs.InitMySQLDB(config)
+
 	// init redis
-	_ = dbs.InitRedisDB(configs.Config.Redis.Redis.Address, configs.Config.Redis.Redis.Password)
+	// _ = dbs.InitRedisDB(configs.Config.Redis.Redis.Address, configs.Config.Redis.Redis.Password)
 }
