@@ -296,12 +296,12 @@ func (r *blockHeightMonitorRunner) CompareBlockHeight(coinBlockMap map[string]*m
 			sender = senders.NewEmailSender()
 		}
 
-		if heightErrorCnt > 0 {
+		if heightErrorCnt > 1 {
 			// send message to channel
 			r.SendMessage(heightErrorMsg, sender)
 		}
 
-		if hashErrorCnt > 0 {
+		if hashErrorCnt > 1 {
 			// send message to channel
 			r.SendMessage(hashErrorMsg, sender)
 		}
