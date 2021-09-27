@@ -36,40 +36,40 @@ type ExplorerConfig struct {
 }
 
 // NewBlockHeightMonitorRunner 初始化
-func NewBlockHeightMonitorRunner(explorerJsonConfig string) (*blockHeightMonitorRunner, error) {
+func NewBlockHeightMonitorRunner(explorerJSONConfig string) (*blockHeightMonitorRunner, error) {
 	runner := &blockHeightMonitorRunner{
-		explorerJSONConfig: explorerJsonConfig,
+		explorerJSONConfig: explorerJSONConfig,
 		exit:               make(chan struct{}),
 	}
 
-	if err := runner.loadExplorerJsonByFile(); err != nil {
-		log.WithField("fileName", explorerJsonConfig).Error("loadExplorerJsonByFile failed")
+	if err := runner.loadExplorerJSONByFile(); err != nil {
+		log.WithField("fileName", explorerJSONConfig).Error("loadExplorerJSONByFile failed")
 		return nil, err
 	}
 
 	for _, value := range runner.confList {
 		log.WithField("step", "init-list-explorers").WithField("name", value.Name).
-			WithField("coin", value.Coin).WithField("HeightJsonPattern",
-			value.HeightJsonPattern).WithField("HashJsonPattern", value.HashJsonPattern).
-			WithField("url", value.Url).WithField("enabled", value.Enabled)
+			WithField("coin", value.Coin).WithField("HeightJSONPattern",
+			value.HeightJSONPattern).WithField("HashJSONPattern", value.HashJSONPattern).
+			WithField("url", value.URL).WithField("enabled", value.Enabled)
 	}
 
 	return runner, nil
 }
 
-// loadExplorerJsonByFile 加载配置
-func (r *blockHeightMonitorRunner) loadExplorerJsonByFile() error {
+// loadExplorerJSONByFile 加载配置
+func (r *blockHeightMonitorRunner) loadExplorerJSONByFile() error {
 	content, err := ioutil.ReadFile(r.explorerJSONConfig)
 	if err != nil {
-		log.WithField("fileName", r.explorerJSONConfig).WithField("error", err).Error("loadExplorerJsonByFile failed")
+		log.WithField("fileName", r.explorerJSONConfig).WithField("error", err).Error("loadExplorerJSONByFile failed")
 		return err
 	}
 
-	return r.loadExplorerJson(content)
+	return r.loadExplorerJSON(content)
 }
 
-// loadExplorerJson
-func (r *blockHeightMonitorRunner) loadExplorerJson(content []byte) error {
+// loadExplorerJSON
+func (r *blockHeightMonitorRunner) loadExplorerJSON(content []byte) error {
 	var data ExplorerConfig
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -139,14 +139,13 @@ func (r *blockHeightMonitorRunner) RunGetBlockInfo(pConfList []*explorer.Explore
 	for _, conf := range pConfList {
 		log.Infof("explorer name:%s, coin name:%s, conf:%v", conf.Name, conf.Coin, *conf)
 		if conf.Enabled {
-			block := &models.Block{}
 			block, err := r.GetExplorerBlockInfo(conf)
 			if err != nil {
 				continue
 			}
 			block.Coin = conf.Coin
 			block.ExplorerName = conf.Name
-			block.Link = conf.Url
+			block.Link = conf.URL
 			result = append(result, block)
 		}
 	}
@@ -160,30 +159,31 @@ func (r *blockHeightMonitorRunner) RunGetBlockInfo(pConfList []*explorer.Explore
 // GetExplorerBlockInfo 获取浏览器块高
 func (r *blockHeightMonitorRunner) GetExplorerBlockInfo(pConf *explorer.Explorer) (result *models.Block, err error) {
 	// 默认 json 格式
-	return r.GetExplorerBlockInfoByJsonFormat(pConf)
+	return r.GetExplorerBlockInfoByJSONFormat(pConf)
 }
 
-// GetExplorerBlockInfoByJsonFormat
-func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJsonFormat(pConf *explorer.Explorer) (result *models.Block, err error) {
+// GetExplorerBlockInfoByJSONFormat
+func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJSONFormat(pConf *explorer.Explorer) (result *models.Block, err error) {
 	result = &models.Block{
 		Coin:         pConf.Coin,
 		ExplorerName: pConf.Name,
 	}
-	body, err := client.Client.Get(pConf.Url, pConf.CustomHeaders)
+	body, err := client.Client.Get(pConf.URL, pConf.CustomHeaders)
 	if err != nil {
 		log.Error(err)
 		return result, err
 	}
 
 	var object interface{}
-	if err := json.Unmarshal(body, &object); err != nil {
+	err = json.Unmarshal(body, &object)
+	if err != nil {
 		log.Error(err)
 		return result, err
 	}
 	log.Debugf("body:%v", object)
 
 	// parse block height
-	height, err := jsonpath.Get(pConf.HeightJsonPattern, object)
+	height, err := jsonpath.Get(pConf.HeightJSONPattern, object)
 	if err != nil {
 		log.Error(err)
 		return result, err
@@ -191,12 +191,15 @@ func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJsonFormat(pConf *explo
 	result.Height = r.ParseBlockHeight(height)
 
 	// parse block hash
-	hash, err := jsonpath.Get(pConf.HashJsonPattern, object)
+	hash, err := jsonpath.Get(pConf.HashJSONPattern, object)
 	if err != nil {
 		log.Error(err)
 		return result, err
 	}
 	result.Hash = hash.(string)
+	if pConf.Name == "blockcypher" {
+		result.Hash = "0x" + result.Hash
+	}
 
 	return result, nil
 }
@@ -289,10 +292,8 @@ func (r *blockHeightMonitorRunner) CompareBlockHeight(coinBlockMap map[string]*m
 		var sender senders.Senders
 		if configs.Config.Slack.IsEnable {
 			sender = senders.NewSlackSender()
-		} else {
-			if configs.Config.Email.IsEnable {
-				sender = senders.NewEmailSender()
-			}
+		} else if configs.Config.Email.IsEnable {
+			sender = senders.NewEmailSender()
 		}
 
 		if heightErrorCnt > 0 {
@@ -304,7 +305,6 @@ func (r *blockHeightMonitorRunner) CompareBlockHeight(coinBlockMap map[string]*m
 			// send message to channel
 			r.SendMessage(hashErrorMsg, sender)
 		}
-
 	}
 }
 

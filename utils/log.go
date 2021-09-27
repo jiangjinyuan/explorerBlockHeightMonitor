@@ -9,11 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func ConfigLocalFilesystemLogger(logPath string, logFileName string, maxAge time.Duration, rotationTime time.Duration) {
+func ConfigLocalFilesystemLogger(logPath, logFileName string, maxAge, rotationTime time.Duration) {
 	baseLogPath := path.Join(logPath, logFileName)
 	writer, err := rotatelogs.New(
 		baseLogPath+".%Y%m%d",
-		//rotatelogs.WithLinkName(baseLogPaht),      // 生成软链，指向最新日志文件
+		// rotatelogs.WithLinkName(baseLogPaht),      // 生成软链，指向最新日志文件
 		rotatelogs.WithMaxAge(maxAge),             // 文件最大保存时间
 		rotatelogs.WithRotationTime(rotationTime), // 日志切割时间间隔
 	)

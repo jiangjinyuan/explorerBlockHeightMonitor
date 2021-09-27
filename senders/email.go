@@ -13,9 +13,9 @@ func NewEmailSender() *EmailSender {
 
 func (e *EmailSender) Send(mess string) {
 	m := gomail.NewMessage()
-	//sender
+	// sender
 	m.SetAddressHeader("From", configs.Config.Email.SenderName, "explorerBlockHeightMonitor")
-	//receiver
+	// receiver
 	m.SetHeader("To", m.FormatAddress(configs.Config.Email.SenderName, "BTC.com"))
 	m.SetHeader("Subject", "Attention from explorerBlockHeightMonitor!")
 	m.SetBody("text/html", mess)

@@ -13,6 +13,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	explorerDatabaseReadConn  = "explorer:general:read"
+	explorerDatabaseWriteConn = "explorer:general:write"
+)
+
 type Block struct {
 	Coin         string `json:"coin" db:"coin"`
 	ExplorerName string `json:"explorer_name" db:"explorer_name"`
@@ -24,7 +29,7 @@ type Block struct {
 }
 
 func GetExplorerBlockInfo(coinList []string) (result []*Block, err error) {
-	conn := "explorer:general:read"
+	conn := explorerDatabaseReadConn
 	if exists := dbs.CheckDBConnExists(conn); !exists {
 		log.WithField("conn", conn).Error("The DB connection not exists!")
 		return result, errors.New("the DB connection not exists")
@@ -42,16 +47,16 @@ func GetExplorerBlockInfo(coinList []string) (result []*Block, err error) {
 	return result, nil
 }
 
-func GetExplorerBlockInfoByTime(time string) (result []*Block, err error) {
-	conn := "explorer:general:read"
+func GetExplorerBlockInfoByTime(datetime string) (result []*Block, err error) {
+	conn := explorerDatabaseReadConn
 	if exists := dbs.CheckDBConnExists(conn); !exists {
 		log.WithField("conn", conn).Error("The DB connection not exists!")
 		return result, errors.New("the DB connection not exists")
 	}
 	sqlQuery := "SELECT `coin`, `explorer_name`, `height`, `hash`, `link`, `created_at`, `updated_at` FROM explorer_block_info WHERE `updated_at` >= ?"
-	err = dbs.DBMaps[conn].Select(&result, sqlQuery, time)
+	err = dbs.DBMaps[conn].Select(&result, sqlQuery, datetime)
 	if err != nil {
-		log.WithFields(log.Fields{"func": "GetExplorerBlockInfoByTime", "time": time}).Error(err.Error())
+		log.WithFields(log.Fields{"func": "GetExplorerBlockInfoByTime", "datetime": datetime}).Error(err.Error())
 		return result, err
 	}
 
@@ -59,7 +64,7 @@ func GetExplorerBlockInfoByTime(time string) (result []*Block, err error) {
 }
 
 func WriteToExplorerBlockHeight(items []*Block) error {
-	conn := "explorer:general:write"
+	conn := explorerDatabaseWriteConn
 	if exists := dbs.CheckDBConnExists(conn); !exists {
 		log.WithField("conn", conn).Error("The DB connection not exists!")
 		return errors.New("the DB connection not exists")

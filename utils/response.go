@@ -7,7 +7,7 @@ const (
 	Error           = 500
 	ErrorAuth       = 403
 	InvalidParams   = 10001
-	InvalidAppId    = 10002
+	InvalidAppID    = 10002
 	InvalidCoinType = 10003
 	ConfigError     = 10004
 	Exist           = 409
@@ -18,7 +18,7 @@ var MessageFlags = map[int]string{
 	Error:           "fail",
 	ErrorAuth:       "auth error",
 	InvalidParams:   "invalid params",
-	InvalidAppId:    "invalid app id",
+	InvalidAppID:    "invalid app id",
 	InvalidCoinType: "invalid coin type",
 	ConfigError:     "config error",
 	Exist:           "exists",
@@ -51,7 +51,6 @@ func Response(c *gin.Context, httpCode, status int, data interface{}) {
 		"message": GetMessage(status),
 		"data":    data,
 	})
-	return
 }
 
 func ResponseError(c *gin.Context, httpCode, status int, data interface{}) {
@@ -61,7 +60,6 @@ func ResponseError(c *gin.Context, httpCode, status int, data interface{}) {
 		"data":    data,
 	})
 	c.AbortWithStatus(httpCode)
-	return
 }
 
 func ResponseList(c *gin.Context, httpCode, status int, list interface{}, count int) {
@@ -80,10 +78,8 @@ func ResponseList(c *gin.Context, httpCode, status int, list interface{}, count 
 		"total_count": count,
 	}
 	Response(c, httpCode, status, data)
-	return
 }
 
 func Redirect(c *gin.Context, httpCode int, url string) {
 	c.Redirect(httpCode, url)
-	return
 }

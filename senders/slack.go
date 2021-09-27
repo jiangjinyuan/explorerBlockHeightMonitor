@@ -2,7 +2,7 @@ package senders
 
 import (
 	"bytes"
-	"net/http"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/client"
 
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	log "github.com/sirupsen/logrus"
@@ -16,8 +16,8 @@ func NewSlackSender() *SlackSender {
 
 func (s *SlackSender) Send(text string) {
 	data := "{\"text\":\"" + text + "\"}"
-	_, err := http.Post(configs.Config.Slack.WebHookURL, "application/json;charset=utf-8",
-		bytes.NewBuffer([]byte(data)))
+	_, err := client.NewHTTPClient().Post(configs.Config.Slack.WebHookURL,
+		bytes.NewBuffer([]byte(data)), "application/json;charset=utf-8")
 	if err != nil {
 		log.Error(err)
 		return

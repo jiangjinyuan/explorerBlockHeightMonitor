@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/client"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/router"
 	"time"
 
-	"github.com/jiangjinyuan/explorerBlockHeightMonitor/client"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/monitor"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/utils"
 	log "github.com/sirupsen/logrus"
@@ -41,7 +41,11 @@ func GeneralCoinHeightMonitor(cmd *cobra.Command, args []string) {
 	}
 
 	// 开启异步定时器
-	go runner.Start()
+	go func() {
+		if err := runner.Start(); err != nil {
+			log.Error(err)
+		}
+	}()
 	defer runner.Close()
 
 	r := router.InitRouter()
