@@ -33,6 +33,30 @@
       "enabled": true
     },
     {
+      "name": "blockstream",
+      "coin": "btc",
+      "url": "https://blockstream.info/api/blocks/latest",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].id",
+      "enabled": true
+    },
+    {
+      "name": "mempool.space",
+      "coin": "btc",
+      "url": "https://mempool.space/api/blocks/latest",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].id",
+      "enabled": true
+    },
+    {
+      "name": "blockcypher",
+      "coin": "btc",
+      "url": "https://api.blockcypher.com/v1/btc/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
+      "enabled": true
+    },
+    {
       "name": "blockchair",
       "coin": "bch",
       "url": "https://api.blockchair.com/bitcoin-cash/blocks?limit=1",
@@ -81,6 +105,14 @@
       "enabled": true
     },
     {
+      "name": "whatsonchain",
+      "coin": "bsv",
+      "url": "https://api.whatsonchain.com/v1/bsv/main/block/headers",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].hash",
+      "enabled": true
+    },
+    {
       "name": "blockchair",
       "coin": "ltc",
       "url": "https://api.blockchair.com/litecoin/blocks?limit=1",
@@ -105,6 +137,14 @@
       "enabled": true
     },
     {
+      "name": "blockcypher",
+      "coin": "ltc",
+      "url": "https://api.blockcypher.com/v1/ltc/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
+      "enabled": true
+    },
+    {
       "name": "blockchair",
       "coin": "eth",
       "url": "https://api.blockchair.com/ethereum/blocks?limit=1",
@@ -126,6 +166,14 @@
       "url": "https://eth-chain.api.btc.com/v1/blocks?start=0&count=1",
       "heightJsonPattern": "$.blocks[0].number",
       "hashJsonPattern": "$.blocks[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "blockcypher",
+      "coin": "eth",
+      "url": "https://api.blockcypher.com/v1/eth/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
       "enabled": true
     }
   ]
