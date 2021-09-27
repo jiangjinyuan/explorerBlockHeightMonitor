@@ -3,14 +3,12 @@ package cmd
 import (
 	"fmt"
 	"github.com/jiangjinyuan/explorerBlockHeightMonitor/configs"
+	"github.com/jiangjinyuan/explorerBlockHeightMonitor/dbs"
 	"github.com/spf13/cobra"
 	"os"
-	"strings"
 )
 
 var cfgFile string
-
-var coin string
 
 var rootCmd = &cobra.Command{
 	Use:   "blockHeightMonitor",
@@ -31,7 +29,6 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "configs/config", "config file (default is $HOME/config.yaml)")
-	rootCmd.PersistentFlags().StringVar(&coin, "coin", "btc", "choose coin")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
@@ -39,8 +36,15 @@ func initConfig() {
 	if cfgFile != "" {
 		configs.InitConfig(cfgFile)
 	}
-	if coin != "" {
-		coin = strings.ToLower(coin)
-	}
 
+	// init mysql
+	config := make(map[string]configs.MySQLDSN)
+	for i := range configs.Config.ExplorerDatabase {
+		databaseConfig := configs.Config.ExplorerDatabase[i]
+		configs.AddDatabaseConfig(&databaseConfig, config)
+	}
+	dbs.InitMySQLDB(config)
+
+	// init redis
+	// _ = dbs.InitRedisDB(configs.Config.Redis.Redis.Address, configs.Config.Redis.Redis.Password)
 }

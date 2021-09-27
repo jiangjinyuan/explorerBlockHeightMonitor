@@ -5,7 +5,7 @@ services:
     container_name: explorer_block_height_monitor
     image: explorer_block_height_monitor
     restart: always
-    entrypoint: "/app/explorerBlockHeightMonitor GeneralCoin --coin btc"
+    entrypoint: "/app/explorerBlockHeightMonitor GeneralCoin"
     volumes:
       - ./configs/config.yaml:/app/configs/config.yaml
       - ./logs:/app/logs

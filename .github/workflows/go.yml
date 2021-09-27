@@ -1,0 +1,44 @@
+name: Go
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Set up Go 1.14
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+        id: go
+      - run: go version
+      - name: Get dependencies And Test
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+          go test -gcflags=-l -v -cover -timeout=5s ./...
+      - name: Golangci Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: ./...
+          skip-go-installation: true
+          skip-pkg-cache: true
+          skip-build-cache: true
+      - run: mkdir bin
+      - name: Build Module
+        run: |
+          go build -v -o ./bin/command ./main.go
+#      - name: Slack
+#        uses: 8398a7/action-slack@v3
+#        with:
+#          status: ${{ job.status }}
+#          fields: repo,message,commit,author,action,ref
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()

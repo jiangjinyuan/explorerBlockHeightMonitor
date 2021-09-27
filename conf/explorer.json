@@ -1,0 +1,180 @@
+{
+  "explorers":  [
+     {
+        "name": "blockchain",
+        "coin": "btc",
+        "url": "https://blockchain.info/latestblock",
+        "heightJsonPattern": "$.height",
+        "hashJsonPattern": "$.hash",
+        "enabled": true
+      },
+    {
+      "name": "blockchair",
+      "coin": "btc",
+      "url": "https://api.blockchair.com/bitcoin/blocks?limit=1",
+      "heightJsonPattern": "$.data[0].id",
+      "hashJsonPattern": "$.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "viabtc",
+      "coin": "btc",
+      "url": "https://explorer.viawallet.com/res/btc/blocks?limit=1",
+      "heightJsonPattern": "$.data.data[0].height",
+      "hashJsonPattern": "$.data.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "btc.com",
+      "coin": "btc",
+      "url": "https://chain.api.btc.com/v3/block/latest",
+      "heightJsonPattern": "$.data.height",
+      "hashJsonPattern": "$.data.hash",
+      "enabled": true
+    },
+    {
+      "name": "blockstream",
+      "coin": "btc",
+      "url": "https://blockstream.info/api/blocks/latest",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].id",
+      "enabled": true
+    },
+    {
+      "name": "mempool.space",
+      "coin": "btc",
+      "url": "https://mempool.space/api/blocks/latest",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].id",
+      "enabled": true
+    },
+    {
+      "name": "blockcypher",
+      "coin": "btc",
+      "url": "https://api.blockcypher.com/v1/btc/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
+      "enabled": true
+    },
+    {
+      "name": "blockchair",
+      "coin": "bch",
+      "url": "https://api.blockchair.com/bitcoin-cash/blocks?limit=1",
+      "heightJsonPattern": "$.data[0].id",
+      "hashJsonPattern": "$.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "viabtc",
+      "coin": "bch",
+      "url": "https://explorer.viabtc.com/res/bch/blocks?limit=1",
+      "heightJsonPattern": "$.data.data[0].height",
+      "hashJsonPattern": "$.data.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "btc.com",
+      "coin": "bch",
+      "url": "https://bch-chain.api.btc.com/v3/block/latest",
+      "heightJsonPattern": "$.data.height",
+      "hashJsonPattern": "$.data.hash",
+      "enabled": true
+    },
+    {
+      "name": "blockchair",
+      "coin": "bsv",
+      "url": "https://api.blockchair.com/bitcoin-sv/blocks?limit=1",
+      "heightJsonPattern": "$.data[0].id",
+      "hashJsonPattern": "$.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "viabtc",
+      "coin": "bsv",
+      "url": "https://explorer.viabtc.com/res/bsv/blocks?limit=1",
+      "heightJsonPattern": "$.data.data[0].height",
+      "hashJsonPattern": "$.data.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "btc.com",
+      "coin": "bsv",
+      "url": "https://bsv-chain.api.btc.com/v3/block/latest",
+      "heightJsonPattern": "$.data.height",
+      "hashJsonPattern": "$.data.hash",
+      "enabled": true
+    },
+    {
+      "name": "whatsonchain",
+      "coin": "bsv",
+      "url": "https://api.whatsonchain.com/v1/bsv/main/block/headers",
+      "heightJsonPattern": "$[0].height",
+      "hashJsonPattern": "$[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "blockchair",
+      "coin": "ltc",
+      "url": "https://api.blockchair.com/litecoin/blocks?limit=1",
+      "heightJsonPattern": "$.data[0].id",
+      "hashJsonPattern": "$.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "viabtc",
+      "coin": "ltc",
+      "url": "https://explorer.viabtc.com/res/ltc/blocks?limit=1",
+      "heightJsonPattern": "$.data.data[0].height",
+      "hashJsonPattern": "$.data.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "btc.com",
+      "coin": "ltc",
+      "url": "https://ltc-chain.api.btc.com/v3/block/latest",
+      "heightJsonPattern": "$.data.height",
+      "hashJsonPattern": "$.data.hash",
+      "enabled": true
+    },
+    {
+      "name": "blockcypher",
+      "coin": "ltc",
+      "url": "https://api.blockcypher.com/v1/ltc/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
+      "enabled": true
+    },
+    {
+      "name": "blockchair",
+      "coin": "eth",
+      "url": "https://api.blockchair.com/ethereum/blocks?limit=1",
+      "heightJsonPattern": "$.data[0].id",
+      "hashJsonPattern": "$.data[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "blockchain",
+      "coin": "eth",
+      "url": "https://api.blockchain.info/v2/eth/data/blocks?size=1",
+      "heightJsonPattern": "$.blockHeaders[0].number",
+      "hashJsonPattern": "$.blockHeaders[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "btc.com",
+      "coin": "eth",
+      "url": "https://eth-chain.api.btc.com/v1/blocks?start=0&count=1",
+      "heightJsonPattern": "$.blocks[0].number",
+      "hashJsonPattern": "$.blocks[0].hash",
+      "enabled": true
+    },
+    {
+      "name": "blockcypher",
+      "coin": "eth",
+      "url": "https://api.blockcypher.com/v1/eth/main",
+      "heightJsonPattern": "$.height",
+      "hashJsonPattern": "$.hash",
+      "enabled": true
+    }
+  ]
+}
