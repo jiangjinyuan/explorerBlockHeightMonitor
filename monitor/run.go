@@ -197,7 +197,7 @@ func (r *blockHeightMonitorRunner) GetExplorerBlockInfoByJSONFormat(pConf *explo
 		return result, err
 	}
 	result.Hash = hash.(string)
-	if pConf.Name == "blockcypher" {
+	if pConf.Coin == "eth" && pConf.Name == "blockcypher" {
 		result.Hash = "0x" + result.Hash
 	}
 
