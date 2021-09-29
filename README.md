@@ -9,6 +9,6 @@ The monitor for different coin's BlockChain explorer, include block height...
 
 ## Contribution
 
-If you want to add other explorer, you can update the conf explorer.json and pr. 
+If you want to add other explorer, you can update the conf [explorer.json](https://github.com/jiangjinyuan/explorerBlockHeightMonitor/blob/master/conf/explorer.json) and pr. 
 
 Contribution Welcome.
