@@ -2,7 +2,13 @@
 
 The monitor for different coin's BlockChain explorer, include block height...
 
-## 用途
+## Usage
 
-* 浏览器块高监控报警
-* 节点块高监控报警
+* multi-coin explorer block height monitor
+* coin node block height monitor
+
+## Contribution
+
+If you want to add other explorer, you can update the conf explorer.json and pr. 
+
+Contribution Welcome.
